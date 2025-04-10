@@ -11,20 +11,47 @@ import BuildingSelector from './BuildingSelector';
 import EnergyMetricsCards from './EnergyMetricsCards';
 import EnergyConsumptionChart from './EnergyConsumptionChart';
 import RecommendationsPanel from './RecommendationsPanel';
+import DebugPanel from './DebugPanel';
 
 const Dashboard: React.FC = () => {
   const [selectedBuildingId, setSelectedBuildingId] = useState(buildings[0]?.id || '');
   const [historicalData, setHistoricalData] = useState(generateHistoricalData(selectedBuildingId));
   const [forecastData, setForecastData] = useState(generateForecastData(selectedBuildingId, historicalData));
   const [recommendations, setRecommendations] = useState(generateRecommendations(selectedBuildingId));
+  const [debugMode, setDebugMode] = useState(false);
+  
+  // Expose debug toggle to window for easy access in browser console
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      (window as any).toggleDebugMode = () => setDebugMode(prev => !prev);
+      console.info('🔍 Debug mode available. Run toggleDebugMode() in console to enable/disable.');
+    }
+    
+    return () => {
+      if (typeof window !== 'undefined') {
+        delete (window as any).toggleDebugMode;
+      }
+    };
+  }, []);
   
   // Update data when building changes
   useEffect(() => {
+    console.log('Building changed to:', selectedBuildingId);
     const newHistoricalData = generateHistoricalData(selectedBuildingId);
     setHistoricalData(newHistoricalData);
     setForecastData(generateForecastData(selectedBuildingId, newHistoricalData));
     setRecommendations(generateRecommendations(selectedBuildingId));
   }, [selectedBuildingId]);
+  
+  // Application state for debugging
+  const applicationState = {
+    selectedBuildingId,
+    historicalDataPoints: historicalData.length,
+    forecastDataPoints: forecastData.length,
+    recommendationsCount: recommendations.length,
+    debugModeEnabled: debugMode,
+    currentTimestamp: new Date().toISOString(),
+  };
   
   return (
     <div className="container py-6 space-y-6">
@@ -60,6 +87,11 @@ const Dashboard: React.FC = () => {
           </TabsContent>
         </Tabs>
       </div>
+      
+      <DebugPanel 
+        visible={debugMode} 
+        applicationState={applicationState} 
+      />
     </div>
   );
 };
