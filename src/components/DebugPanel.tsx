@@ -31,6 +31,21 @@ const DebugPanel: React.FC<DebugPanelProps> = ({ visible, applicationState }) =>
     });
   };
   
+  // Get memory usage safely with type checking
+  const getMemoryUsage = (): number => {
+    try {
+      // Check if performance and memory API are available
+      if (typeof performance !== 'undefined' && 
+          performance.memory && 
+          'usedJSHeapSize' in performance.memory) {
+        return Math.round((performance.memory as any).usedJSHeapSize / 1048576);
+      }
+      return 0;
+    } catch (e) {
+      return 0;
+    }
+  };
+  
   return (
     <Card className="fixed bottom-4 right-4 w-96 z-50 shadow-lg border-energy-blue">
       <CardHeader className="bg-gray-50 border-b">
@@ -81,7 +96,7 @@ const DebugPanel: React.FC<DebugPanelProps> = ({ visible, applicationState }) =>
               <div className="text-xs p-2 bg-gray-100 rounded">
                 <span className="text-gray-500">Memory Usage:</span> 
                 <span className="font-mono ml-1">
-                  {Math.round(performance.memory?.usedJSHeapSize / 1048576 || 0)} MB
+                  {getMemoryUsage()} MB
                 </span>
               </div>
             </div>

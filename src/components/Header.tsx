@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Button } from "@/components/ui/button";
 import { BellIcon, Settings, Bug } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
@@ -10,19 +10,15 @@ import {
   DropdownMenuSeparator, 
   DropdownMenuTrigger 
 } from "@/components/ui/dropdown-menu";
+import { useDebug } from '@/pages/Index';
 
 const Header = () => {
   const { toast } = useToast();
-  const [debugMode, setDebugMode] = useState(false);
+  const { debugMode, setDebugMode } = useDebug();
   
   const toggleDebugMode = () => {
     const newDebugMode = !debugMode;
     setDebugMode(newDebugMode);
-    
-    // Update the global debug state via window object to communicate with Dashboard
-    if (typeof window !== 'undefined' && (window as any).toggleDebugMode) {
-      (window as any).toggleDebugMode();
-    }
     
     toast({
       title: newDebugMode ? "Debug mode enabled" : "Debug mode disabled",

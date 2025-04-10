@@ -12,27 +12,14 @@ import EnergyMetricsCards from './EnergyMetricsCards';
 import EnergyConsumptionChart from './EnergyConsumptionChart';
 import RecommendationsPanel from './RecommendationsPanel';
 import DebugPanel from './DebugPanel';
+import { useDebug } from '@/pages/Index';
 
 const Dashboard: React.FC = () => {
   const [selectedBuildingId, setSelectedBuildingId] = useState(buildings[0]?.id || '');
   const [historicalData, setHistoricalData] = useState(generateHistoricalData(selectedBuildingId));
   const [forecastData, setForecastData] = useState(generateForecastData(selectedBuildingId, historicalData));
   const [recommendations, setRecommendations] = useState(generateRecommendations(selectedBuildingId));
-  const [debugMode, setDebugMode] = useState(false);
-  
-  // Expose debug toggle to window for easy access in browser console
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      (window as any).toggleDebugMode = () => setDebugMode(prev => !prev);
-      console.info('🔍 Debug mode available. Run toggleDebugMode() in console to enable/disable.');
-    }
-    
-    return () => {
-      if (typeof window !== 'undefined') {
-        delete (window as any).toggleDebugMode;
-      }
-    };
-  }, []);
+  const { debugMode } = useDebug();
   
   // Update data when building changes
   useEffect(() => {
