@@ -10,6 +10,21 @@ type DebugPanelProps = {
   applicationState: any;
 }
 
+// Extend Window interface to include performance.memory 
+interface ExtendedPerformance extends Performance {
+  memory?: {
+    usedJSHeapSize: number;
+    totalJSHeapSize: number;
+    jsHeapSizeLimit: number;
+  };
+}
+
+declare global {
+  interface Window {
+    performance: ExtendedPerformance;
+  }
+}
+
 const DebugPanel: React.FC<DebugPanelProps> = ({ visible, applicationState }) => {
   const { toast } = useToast();
   
@@ -31,14 +46,15 @@ const DebugPanel: React.FC<DebugPanelProps> = ({ visible, applicationState }) =>
     });
   };
   
-  // Get memory usage safely with type checking
+  // Get memory usage safely with proper type checking
   const getMemoryUsage = (): number => {
     try {
       // Check if performance and memory API are available
-      if (typeof performance !== 'undefined' && 
-          performance.memory && 
-          'usedJSHeapSize' in performance.memory) {
-        return Math.round((performance.memory as any).usedJSHeapSize / 1048576);
+      if (typeof window !== 'undefined' && 
+          window.performance && 
+          'memory' in window.performance &&
+          window.performance.memory) {
+        return Math.round(window.performance.memory.usedJSHeapSize / 1048576);
       }
       return 0;
     } catch (e) {
