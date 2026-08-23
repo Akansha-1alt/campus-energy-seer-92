@@ -60,3 +60,4 @@ Open the local URL displayed in the terminal to view the application.
 
 Akansha Yadav
 GitHub: https://github.com/Akansha-1alt
+Vercel:https://campus-energy-seer-92.vercel.app/
